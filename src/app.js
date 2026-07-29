@@ -9,6 +9,7 @@ const taskRouter = require("./routes/taskRoutes");
 const corsOptions = require("./config/cors");
 const app = express();
 
+app.set("trust proxy", 1);
 // security middleware
 app.use(cors(corsOptions));
 app.use(generalLimiter);
