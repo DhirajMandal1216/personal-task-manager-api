@@ -1,6 +1,6 @@
 # Personal Task Manager API
 
-A REST API for managing personal tasks with user authentication, 
+A REST API for managing personal tasks with user authentication,
 role-based authorization, and full CRUD functionality.
 
 ## Features
@@ -54,7 +54,6 @@ src/
 └── errors/
 └── AppError.js
 
-
 ## Environment Variables
 
 Create a `.env` file in the project root with:
@@ -63,7 +62,6 @@ MONGO_URI=your_mongodb_atlas_connection_string
 JWT_SECRET=your_jwt_secret
 NODE_ENV=development
 PORT=3000
-
 
 **Never commit `.env` to version control.**
 
@@ -76,11 +74,14 @@ npm run dev
 
 ## Deployment
 
-Deployed on [Render](https://render.com). Database hosted on 
-[MongoDB Atlas](https://www.mongodb.com/cloud/atlas) (free M0 tier).
+Deployed on Render (free tier). Database hosted on MongoDB Atlas (free M0 tier).
+
+Render automatically assigns PORT and sets NODE_ENV=production at runtime — these do not need to be set manually in Render's dashboard, only in local .env.
 
 ## Known Limitations
 
-- `express-mongo-sanitize` not used — incompatible with Express 5's read-only 
-  `req.query`. Input safety currently relies on Joi validation only. 
-  NoSQL-operator-shaped payloads (e.g. `{ "$gt": "" }`) are not explicitly blocked.
+express-mongo-sanitize not used — incompatible with Express 5's read-only req.query.
+Input safety currently relies on Joi validation only.
+NoSQL-operator-shaped payloads (e.g. { "$gt": "" }) are not explicitly blocked.
+Refresh tokens are implemented at a basic level (stateless, verified via jwt.verify() only). 
+No database-tracked revocation or rotation yet — planned as a learning topic for a future project.
