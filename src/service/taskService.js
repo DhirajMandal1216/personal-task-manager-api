@@ -4,6 +4,7 @@ const {
   NotFoundError,
   AppError,
 } = require("../errors/AppError");
+const mongoose = require("mongoose");
 //  constants
 const validStatus = ["pending", "in-progress", "completed"];
 const validPriority = ["low", "medium", "high"];
@@ -26,7 +27,7 @@ const getAllTask = async (query, requestingUser) => {
     filter.priority = priority;
   }
 
-  return await Task.find(filter);
+  return await Task.find(filter).populate("owner", "name email").lean();
 };
 
 // get by id
@@ -35,7 +36,7 @@ const getTaskById = async (id, requestingUser) => {
   if (!task) {
     throw new NotFoundError("Task not found!");
   }
-
+  console.log(task.isOverdue);
   if (
     requestingUser.role !== "admin" &&
     task.owner.toString() !== requestingUser._id.toString()
@@ -59,6 +60,16 @@ const createTask = async (userId, data) => {
   return task;
 };
 
+const getTaskStats = async (userId) => {
+  const stat = await Task.aggregate([
+    { $match: { owner: new mongoose.Types.ObjectId(userId) } },
+    { $group: { _id: "$status", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+  ]);
+
+  return stat;
+};
+
 const updateTask = async (id, data, requestingUser) => {
   const task = await Task.findById(id);
   if (!task) throw new NotFoundError("Task not found");
@@ -76,7 +87,10 @@ const updateTask = async (id, data, requestingUser) => {
   if (priority && !validPriority.includes(priority))
     throw new ValidationError("Invalid priority value");
 
-  return await Task.findByIdAndUpdate(id, data, { new: true });
+  return await Task.findByIdAndUpdate(id, data, {
+    returnDocument: "after",
+    runValidators: true,
+  });
 };
 
 const deleteTask = async (id, requestingUser) => {
@@ -99,4 +113,5 @@ module.exports = {
   createTask,
   updateTask,
   deleteTask,
+  getTaskStats,
 };

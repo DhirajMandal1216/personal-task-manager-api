@@ -25,9 +25,8 @@ const registerUser = async (data) => {
   if (existingUser) {
     throw new ValidationError("Email already exists");
   }
-  const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await User.create({ ...data, password: hashedPassword });
+  const user = await User.create(data);
   const accessToken = createAccessToken(user);
   const refreshToken = createRefreshToken(user);
 
@@ -46,11 +45,11 @@ const registerUser = async (data) => {
 const loginUser = async (data) => {
   const { email, password } = data;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("+password");
   if (!user) {
     throw new ValidationError("Invalid credentials");
   }
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = await user.comparePassword(password)
   if (!isMatch) {
     throw new ValidationError("Invalid credentials");
   }
