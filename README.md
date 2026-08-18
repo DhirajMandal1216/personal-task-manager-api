@@ -85,3 +85,4 @@ Input safety currently relies on Joi validation only.
 NoSQL-operator-shaped payloads (e.g. { "$gt": "" }) are not explicitly blocked.
 Refresh tokens are implemented at a basic level (stateless, verified via jwt.verify() only). 
 No database-tracked revocation or rotation yet — planned as a learning topic for a future project.
+ 
